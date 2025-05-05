@@ -6,6 +6,8 @@ import { useContext } from 'react';
 import { Dropdown, ButtonGroup } from "react-bootstrap";
 import { IoSearch } from "react-icons/io5";
 import { IoIosNotifications } from "react-icons/io";
+import Followers from './Followers';
+import Followings from './Followings';
 
 
 function Header() {
@@ -78,22 +80,28 @@ function Header() {
     <div className='shadow bg-dark'>
             <nav className='header d-flex justify-content-end pt-3 px-2'>
                 {
-                    isSignedIn ? 
+                    isSignedIn ?
                     <>
                         <ul className='lead list-unstyled w-50 d-flex justify-content-around header-links align-items-center'>
                             <li>
                                 <Link to='' className='text-white text-decoration-none'>Home</Link>
                             </li>
                             {
-                                currentUser.userName.length == 0 ? 
-                                <button className="btn btn-outline-danger bg-white" onClick={handleSignout}>SignOut</button> : 
+                                currentUser.userName.length == 0 ?
+                                <button className="btn btn-outline-danger bg-white" onClick={handleSignout}>SignOut</button> :
                                 <>
-                                <div className='d-flex justify-content-around' style={{width:"80px"}}>
+                                <div className='d-flex justify-content-around align-items-center' style={{width:"350px"}}>
                                     <li>
                                         <Link to="search_users_communities"><IoSearch className='text-light m-0 p-0 '/></Link>
                                     </li>
                                     <li>
                                         <Link to=""><IoIosNotifications className='text-light'/></Link>
+                                    </li>
+                                    <li>
+                                        <Followers />
+                                    </li>
+                                    <li>
+                                        <Followings />
                                     </li>
                                 </div>
                                 <Dropdown as={ButtonGroup}>
@@ -108,7 +116,7 @@ function Header() {
                                 </>
                             }
                         </ul>
-                    </> : 
+                    </> :
                     <>
                         <ul className='lead list-unstyled w-50 d-flex justify-content-around header-links'>
                             <li>
