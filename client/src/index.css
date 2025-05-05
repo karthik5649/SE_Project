@@ -1,0 +1,90 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* body {
+    background: url('https://img.freepik.com/free-photo/top-view-books-with-copy-space_23-2148827187.jpg?t=st=1739291273~exp=1739294873~hmac=da3f405c2c408ac57bf3485d1193473f0fd345ab2651e727e9904edaa62ce2cf&w=1380');
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: #fff;
+    text-align: center;
+} */
+
+.cta-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: purple;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.cta-btn:hover {
+    background-color: #7b42f5;
+}
+
+footer {
+    padding: 20px;
+    background: #111;
+    color: white;
+    font-size: 14px;
+}
+
+footer p {
+    margin: 0;
+}
+
+.hovering-chats :hover{
+    background-color:rgb(244, 243, 242);
+}
+
+.msg-display{
+    background-color: rgb(198, 197, 195);
+}
+
+/* Home page styles */
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card .stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+}
+
+.bg-opacity-10 {
+    --bs-bg-opacity: 0.1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
