@@ -45,7 +45,7 @@ function Followers() {
   return (
     <>
       <Button variant="link" className="text-white text-decoration-none" onClick={handleShow}>
-        Followers ({currentUser?.followers?.length || 0})
+        Followers
       </Button>
 
       <Modal show={show} onHide={handleClose} centered size="md">
@@ -61,17 +61,17 @@ function Followers() {
             <p className="text-center text-muted">You don't have any followers yet.</p>
           ) : (
             followers.map((follower) => (
-              <div 
-                key={follower.userName} 
+              <div
+                key={follower.userName}
                 className="d-flex align-items-center p-2 mb-2 border-bottom"
                 style={{ cursor: 'pointer' }}
                 onClick={() => viewProfile(follower)}
               >
-                <img 
-                  src={follower.profileImgUrl} 
-                  alt={follower.userName} 
-                  className="rounded-circle me-3" 
-                  style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                <img
+                  src={follower.profileImgUrl}
+                  alt={follower.userName}
+                  className="rounded-circle me-3"
+                  style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                 />
                 <div>
                   <h6 className="mb-0">{follower.userName}</h6>

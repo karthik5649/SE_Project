@@ -90,7 +90,7 @@ function Header() {
                                 currentUser.userName.length == 0 ?
                                 <button className="btn btn-outline-danger bg-white" onClick={handleSignout}>SignOut</button> :
                                 <>
-                                <div className='d-flex justify-content-around align-items-center' style={{width:"350px"}}>
+                                <div className='d-flex justify-content-around align-items-center' style={{width:"300px"}}>
                                     <li>
                                         <Link to="search_users_communities"><IoSearch className='text-light m-0 p-0 '/></Link>
                                     </li>
