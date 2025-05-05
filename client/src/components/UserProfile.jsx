@@ -211,18 +211,55 @@ function UserProfile() {
     }
 
     async function createChat(){
-        let token = await getToken()
-        let res = await axios.post(`http://localhost:3000/userApp/chat`,[currentUser,selectedUser],{
-            headers:{
-                'Authorization' : `Bearer ${token}`
+        try {
+            console.log("Creating chat with user:", selectedUser.userName);
+            let token = await getToken()
+            let res = await axios.post(`http://localhost:3000/userApp/chat`,[currentUser,selectedUser],{
+                headers:{
+                    'Authorization' : `Bearer ${token}`
+                }
+            })
+
+            if(res.data.message === true){
+                console.log("Chat created successfully, preparing to navigate");
+
+                // Get the updated user data with the new chat
+                const updatedCurrentUser = {...res.data.payload[0]}
+                localStorage.setItem("currentuser", JSON.stringify(updatedCurrentUser))
+
+                // Find the chat that was just created
+                const chatInfo = updatedCurrentUser.chats.find(chat => chat.userName === selectedUser.userName)
+
+                if (chatInfo) {
+                    console.log("Found chat info:", chatInfo);
+
+                    // Create a complete user object for the selected user with chat ID
+                    const completeSelectedUser = {
+                        ...selectedUser,
+                        chatId: chatInfo.chatId
+                    }
+
+                    // Store the selected user in localStorage
+                    localStorage.setItem("selecteduser", JSON.stringify(completeSelectedUser))
+
+                    // Clear any previous chat errors
+                    localStorage.setItem("chaterror", "")
+
+                    // Show success message
+                    toast.success("Opening chat with " + selectedUser.userName)
+
+                    console.log("Navigating to messages page...");
+
+                    // Navigate directly to messages page
+                    window.location.href = "/messages";
+                } else {
+                    console.error("Chat created but couldn't find chat details");
+                    toast.error("Chat created but couldn't find chat details. Please try again.")
+                }
             }
-        })
-        console.log(res.data.payload[2])
-        if(res.data.message === true){
-            localStorage.setItem("currentuser",JSON.stringify({...res.data.payload[0]}))
-            setCurrentUser({...res.data.payload[0]})
-            localStorage.setItem("selecteduser",JSON.stringify({...res.data.payload[1]}))
-            setSelectedUser({...res.data.payload[1]})
+        } catch (error) {
+            console.error("Error creating chat:", error)
+            toast.error("Failed to start conversation. Please try again.")
         }
     }
 

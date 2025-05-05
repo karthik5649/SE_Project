@@ -70,14 +70,13 @@ function Messages() {
   })
   const [msgs, setMsgs] = useState([])
   const messagesEndRef = useRef(null);
-  const [show, setShow] = useState(false)
 
   // scroll function
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // scroll 
+  // scroll
   useEffect(() => {
     scrollToBottom();
   }, [msgs]); // when messages change
@@ -112,14 +111,37 @@ function Messages() {
 
   }, [])
 
-  // declare variables
+  // Initialize component and load data
   useEffect(() => {
-    // window.location.reload();
-    setTimeout(() => { setLoading(false) }, 1000)
-    setSelectedUser({ ...JSON.parse(localStorage.getItem("selecteduser")) })
-    setChatError(localStorage.getItem("chaterror"))
-    getCurrentUser()
-    getChat()
+    const initializeComponent = async () => {
+      try {
+        // Get selected user from localStorage
+        const storedSelectedUser = JSON.parse(localStorage.getItem("selecteduser"))
+        if (storedSelectedUser) {
+          setSelectedUser(storedSelectedUser)
+        }
+
+        // Get chat error if any
+        const storedChatError = localStorage.getItem("chaterror")
+        if (storedChatError) {
+          setChatError(storedChatError)
+        }
+
+        // Get current user and chat data
+        await getCurrentUser()
+        await getChat()
+
+        // Hide loading spinner after everything is loaded
+        setTimeout(() => {
+          setLoading(false)
+        }, 800)
+      } catch (error) {
+        console.error("Error initializing Messages component:", error)
+        setLoading(false)
+      }
+    }
+
+    initializeComponent()
   }, [])
 
   // gets current user
@@ -129,20 +151,34 @@ function Messages() {
 
   // function to get current user
   async function getCurrentUser() {
-    let cuser = JSON.parse(localStorage.getItem("currentuser"))
-    let token = await getToken()
-    let res = await axios.get(`http://localhost:3000/userApp/user/${cuser.email}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+    try {
+      let cuser = JSON.parse(localStorage.getItem("currentuser"))
+      if (!cuser || !cuser.email) {
+        console.error("Current user not found in localStorage or missing email")
+        return
       }
-    })
-    if (res.status === 200) {
-      let user = res.data.payload[0]
-      setCurrentUser({ ...user })
-      localStorage.setItem("currentuser", JSON.stringify(user))
-      if (user.chats.length != 0) {
-        setChats([...cuser.chats])
+
+      let token = await getToken()
+      let res = await axios.get(`http://localhost:3000/userApp/user/${cuser.email}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (res.status === 200 && res.data.payload && res.data.payload.length > 0) {
+        let user = res.data.payload[0]
+        setCurrentUser({ ...user })
+        localStorage.setItem("currentuser", JSON.stringify(user))
+
+        // Update chats list from the latest user data
+        if (user.chats && user.chats.length > 0) {
+          setChats([...user.chats])
+        }
+
+        return user
       }
+    } catch (error) {
+      console.error("Error fetching current user:", error)
     }
   }
 
@@ -374,16 +410,66 @@ function Messages() {
 
   // getting chat with userName
   async function getChat() {
-    let suser = JSON.parse(localStorage.getItem("selecteduser"))
-    if (suser.userName.length > 0) {
+    try {
+      // Get selected user from localStorage
+      let suser = JSON.parse(localStorage.getItem("selecteduser"))
+
+      // Make sure we have a valid selected user
+      if (!suser || !suser.userName || suser.userName.length === 0) {
+        console.log("No selected user found or invalid user")
+        return
+      }
+
+      // Check if chatId exists
+      if (!suser.chatId) {
+        console.log("No chatId found for selected user, trying to find it")
+
+        // Get current user with latest data
+        let cuser = JSON.parse(localStorage.getItem("currentuser"))
+        if (!cuser || !cuser.chats || cuser.chats.length === 0) {
+          console.log("Current user has no chats")
+          return
+        }
+
+        // Find the chat with the selected user
+        const userChat = cuser.chats.find(chat => chat.userName === suser.userName)
+        if (!userChat || !userChat.chatId) {
+          console.log("Could not find chat with selected user in current user's chats")
+          return
+        }
+
+        // Update selected user with chatId
+        suser.chatId = userChat.chatId
+        localStorage.setItem("selecteduser", JSON.stringify(suser))
+        setSelectedUser(suser)
+        console.log("Found chatId for selected user:", suser.chatId)
+      }
+
+      // Get chat data from server
+      console.log("Fetching chat with ID:", suser.chatId)
       let token = await getToken()
       let res = await axios.get(`http://localhost:3000/chatApp/getChat/${suser.chatId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-      setChat({ ...res.data.payload })
-      setMsgs([...res.data.payload.messages])
+
+      // Update chat and messages state
+      if (res.data && res.data.payload) {
+        setChat({ ...res.data.payload })
+
+        // Set messages if they exist
+        if (res.data.payload.messages) {
+          setMsgs([...res.data.payload.messages])
+        } else {
+          setMsgs([])
+        }
+
+        console.log("Chat loaded successfully")
+        return res.data.payload
+      }
+    } catch (error) {
+      console.error("Error getting chat:", error)
     }
   }
 
@@ -444,7 +530,7 @@ function Messages() {
                     <>
                       {
                         (chats.length === 0 && searchedUser.userName.length === 0) ?
-                          // user chats 
+                          // user chats
                           <div className='d-flex justify-content-center align-items-center'>
                             <p className='text-secondary text-center p-3'>--Search your followers--</p>
                           </div> :
@@ -498,11 +584,7 @@ function Messages() {
                                       msg.senderUserName === currentUser.userName
                                         ?
                                         <div className='d-flex justify-content-end my-3' >
-                                          <div
-                                            onMouseEnter={() => setShow(true)}
-                                            onMouseLeave={() => setShow(false)}
-                                            className='bg-white px-4 py-2 rounded-3'
-                                          >
+                                          <div className='bg-white px-4 py-2 rounded-3'>
                                             <div className="d-flex justify-content-between">
                                               <p className='p-0 m-0 me-3'>{msg.message}</p>
                                               <div className="dropdown d-flex justify-content-end">
@@ -519,11 +601,7 @@ function Messages() {
                                         </div>
                                         :
                                         <div className='d-flex justify-content-start my-3' >
-                                          <div
-                                            onMouseEnter={() => setShow(true)}
-                                            onMouseLeave={() => setShow(false)}
-                                            className='bg-white px-4 py-2 rounded-3'
-                                          >
+                                          <div className='bg-white px-4 py-2 rounded-3'>
                                             <div className="d-flex justify-content-between">
                                               <p className='p-0 m-0 me-3'>{msg.message}</p>
                                               <div className="dropdown d-flex justify-content-end">
