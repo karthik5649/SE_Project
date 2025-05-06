@@ -300,9 +300,10 @@ function Home() {
               <>
                 <section className="d-flex justify-content-center align-items-center h-100 mt-5">
                   <div className="hero-content vh-100 text-center">
-                    <h1 className='text-center'>"Empower Your Learning Journey"</h1>
+                    <h1 className='text-center m-5'>StudySync</h1>
+                    <h6 className='text-center'>"Empower Your Learning Journey"</h6>
                     <p>""Unlock a world of academic resources, collaboration, and success.""</p>
-                    <div className="cta-btn">Join Community</div>
+                    {/* <div className="cta-btn">Join Community</div> */}
                   </div>
                 </section>
 

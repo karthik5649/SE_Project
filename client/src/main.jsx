@@ -19,6 +19,7 @@ import CommunityDetail from './components/CommunityDetail.jsx';
 import SearchUsersCommunities from './components/SearchUsersCommunities/SearchUsersCommunities.jsx';
 import ChattingPage from './components/ChattingPage.jsx';
 import TodoList from './components/TODOList/TodoList.jsx';
+import PomodoroTimer from './components/pomodorotimer.jsx';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -54,6 +55,9 @@ const browserRouterObj = createBrowserRouter([{
     },{
       path : "todolist",
       element : <TodoList/>
+    },{
+      path:"pomodorotimer",
+      element : <PomodoroTimer/>
     }
   ]
 },{
