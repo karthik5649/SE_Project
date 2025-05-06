@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaBars, FaTimes, FaHome, FaUser, FaCog } from "react-icons/fa";
+import { FaBars, FaTimes, FaHome, FaUser, FaCog, FaHourglassHalf } from "react-icons/fa";
 import { SiGooglemessages } from "react-icons/si";
 import { RiUserCommunityFill } from "react-icons/ri";
 import { LuListTodo } from "react-icons/lu";
@@ -40,6 +40,12 @@ function Offcanvas() {
             <Link to="todolist" className="nav-link text-white d-flex align-items-center">
               <LuListTodo className="me-2" />
               {!isCollapsed && "TodoList"}
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="pomodorotimer" className="nav-link text-white d-flex align-items-center">
+              <FaHourglassHalf className="me-2" />
+              {!isCollapsed && "Pomodoro Timer"}
             </Link>
           </li>
         </ul>
