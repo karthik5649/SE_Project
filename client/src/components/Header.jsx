@@ -95,6 +95,9 @@ function Header() {
                                         <Link to="search_users_communities"><IoSearch className='text-light m-0 p-0 '/></Link>
                                     </li>
                                     <li>
+                                        <Link to=""><IoIosNotifications className='text-light'/></Link>
+                                    </li>
+                                    <li>
                                         <Followers />
                                     </li>
                                     <li>

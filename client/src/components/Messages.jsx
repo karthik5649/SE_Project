@@ -13,7 +13,21 @@ import { IoMdArrowDropdown } from "react-icons/io";
 
 function Messages() {
 
-  const socket = io('http://localhost:3000');
+  // Create socket connection only once using useRef
+  const socketRef = useRef(null);
+  useEffect(() => {
+    // Initialize socket connection if it doesn't exist
+    if (!socketRef.current) {
+      socketRef.current = io('http://localhost:3000');
+    }
+
+    // Clean up socket connection on component unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
 
   const { currentUser, setCurrentUser } = useContext(currentUserContextObj)
   const navigate = useNavigate()
@@ -87,14 +101,20 @@ function Messages() {
 
   // socket joins room
   useEffect(() => {
-    let cuser = JSON.parse(localStorage.getItem("currentuser"))
-    socket.emit('join_room', cuser.userName)
-  });
+    if (socketRef.current) {
+      let cuser = JSON.parse(localStorage.getItem("currentuser"))
+      socketRef.current.emit('join_room', cuser.userName)
+    }
+  }, [socketRef.current]);
 
   // receives msg
   useEffect(() => {
+    if (!socketRef.current) return;
+
     const handleMessage = (data) => {
       let suser = JSON.parse(localStorage.getItem("selecteduser"))
+      if (!suser || !data || !data[0]) return;
+
       console.log(data[0].senderUserName)
       console.log(suser.userName)
       if (data[0].senderUserName === suser.userName) {
@@ -102,14 +122,16 @@ function Messages() {
       }
     };
 
-    socket.on("receive_message", handleMessage);
+    socketRef.current.on("receive_message", handleMessage);
 
     // ✅ Clean up listener to prevent duplication
     return () => {
-      socket.off("receive_message");
+      if (socketRef.current) {
+        socketRef.current.off("receive_message");
+      }
     };
 
-  }, [])
+  }, [socketRef.current])
 
   // Initialize component and load data
   useEffect(() => {
@@ -201,7 +223,9 @@ function Messages() {
       status: "sent"
     }
     setMsgs((prevChat) => [...prevChat, message]);
-    socket.emit("send_message", ([message, selectedUser.userName]));
+    if (socketRef.current) {
+      socketRef.current.emit("send_message", ([message, selectedUser.userName]));
+    }
     addMessageIntoDatabase(message)
     resetForm2()
   }

@@ -70,7 +70,21 @@ export default function PomodoroTimer() {
   const handleTimerComplete = () => {
     // Play sound
     if (audioRef.current) {
-      audioRef.current.play();
+      audioRef.current.play().catch(error => {
+        console.error("Error playing audio:", error);
+        // Create a fallback beep function using the Web Audio API
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (fallbackError) {
+          console.error("Fallback audio also failed:", fallbackError);
+        }
+      });
     }
 
     if (timerMode === 'pomodoro') {
@@ -182,7 +196,17 @@ export default function PomodoroTimer() {
   return (
     <Container className="py-5">
       {/* Audio element for notification */}
-      <audio ref={audioRef} src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" />
+      <audio ref={audioRef} src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" onError={(e) => {
+        console.log("Audio failed to load, using browser beep as fallback");
+        // Create a fallback beep function using the Web Audio API
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
+      }} />
 
       {/* Alert for notifications */}
       {showAlert && (
